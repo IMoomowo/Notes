@@ -1,0 +1,115 @@
+// styles/abstracts/_mixins.scss
+
+// Центрирование flex
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Flex с пространством между элементами
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Flex колонка
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Обрезка текста с многоточием (для одной строки)
+@mixin text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Обрезка текста с многоточием (для нескольких строк)
+@mixin text-ellipsis($lines: 3) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Базовая карточка
+@mixin card {
+  background: $bg-card;
+  border-radius: 5px;
+  border: 1px solid $border;
+  transition: box-shadow 0.2s ease;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Адаптивные брейкпоинты
+@mixin responsive($breakpoint) {
+  @if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (max-width: $breakpoint-md) { @content; }
+  }
+  @if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) { @content; }
+  }
+}
+
+// Абсолютное позиционирование по центру
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Квадрат
+@mixin square($size) {
+  width: $size;
+  height: $size;
+}
+
+// Адаптивный шрифт
+@mixin responsive-font($min-size, $max-size) {
+  font-size: $min-size;
+  
+  @media (min-width: 768px) {
+    font-size: calc(#{$min-size} + (#{$max-size} - #{$min-size}) * ((100vw - 320px) / (1200 - 320)));
+  }
+  
+  @media (min-width: 1200px) {
+    font-size: $max-size;
+  }
+}
+
+// Скрытие элемента визуально (для скринридеров)
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Убираем скроллбар но оставляем возможность скролла
+@mixin hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

@@ -1,0 +1,203 @@
+// styles/components/_sidebar.scss
+
+// Переменные (если нет в abstracts)
+$sidebar-width: 80px;
+$sidebar-width-mobile: 260px;
+$bg-card: #FFFFFF;
+$border: #E2E8F0;
+$bg-page: #F0F0F0;
+$accent: #6366F1;
+$danger: #EF4444;
+$text-primary: #1E293B;
+
+// Кнопка-гамбургер (только на мобилках)
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 101;
+  background: #46376D;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: 768px) {
+    display: flex;
+  }
+}
+
+// Сайдбар
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: $sidebar-width;
+  height: 100vh;
+  background: $bg-card;
+  border-right: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+  
+  // Логотип
+ &__logo {
+    flex-shrink: 0;
+    margin-bottom: 0;
+    
+    svg {
+      display: block;
+    }
+  }
+  
+  // Навигация (иконки друг за другом)
+   &__nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+  
+  // Общий стиль иконок
+  &__icon {
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-primary;
+    border-radius: 12px;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: $bg-page;
+    }
+    
+    &--logout {
+      color: $danger;
+      flex-shrink: 0;
+    }
+  }
+  
+  // Обёртка для TagManager (чтобы иконка была в той же стилистике)
+  &__tag-manager-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    button {
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      
+      &:hover {
+        background: $bg-page;
+      }
+    }
+  }
+  
+  // Мобильная версия — выезжает слева
+  @media (max-width: 768px) {
+    width: $sidebar-width-mobile;
+    transform: translateX(-100%);
+    box-shadow: none;
+    
+    &--open {
+      transform: translateX(0);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    &__nav {
+      gap: 2rem;
+    }
+    
+    &__icon {
+      width: 56px;
+      height: 56px;
+      font-size: 2rem;
+    }
+    
+    &__tag-manager-wrapper button {
+      width: 56px;
+      height: 56px;
+      font-size: 2rem;
+    }
+  }
+}
+
+// Затемнение для мобильного меню
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+// Корректировка основного контента под сайдбар
+.main-content {
+  flex: 1;
+  margin-left: $sidebar-width;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+}
+
+.notes-page {
+  margin-left: $sidebar-width;
+  padding: 2rem;
+  min-height: 100vh;
+  background: $bg-page;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 5rem;
+  }
+}
+
+.sidebar__logo {
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  svg {
+    width: 30px;
+    height: 30px;
+    display: block;
+  }
+}

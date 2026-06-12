@@ -1,0 +1,235 @@
+// styles/components/_modal.scss
+
+// Затемнение
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+// Основная модалка
+.create-modal {
+  background: #F0F0F0;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 600px;
+  padding: 24px;
+  
+  &__title {
+    text-align: center;
+    font-size: 96px;
+    font-weight: 600;
+    color: #46376D;
+    margin-bottom: 24px;
+  }
+  
+  &__field {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    
+    @media (max-width: 550px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  
+  &__label {
+    font-size: 48px;
+    font-weight: 500;
+    color: #852221;
+    min-width: 70px;
+  }
+  
+  &__input {
+    flex: 1;
+    height: 44px;
+    padding: 0 16px;
+    background: #D9D9D9;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #46376D;
+    outline: none;
+    
+    &::placeholder {
+      color: rgba(70, 55, 109, 0.4);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(70, 55, 109, 0.2);
+    }
+  }
+  
+  &__tag-controls {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    
+    @media (max-width: 550px) {
+      width: 100%;
+    }
+  }
+  
+  &__select {
+    flex: 1;
+    height: 44px;
+    padding: 0 16px;
+    background: #D9D9D9;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #46376D;
+    outline: none;
+    cursor: pointer;
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(70, 55, 109, 0.2);
+    }
+  }
+  
+  &__new-tag {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  &__new-tag-input {
+    width: 100px;
+    height: 44px;
+    padding: 0 12px;
+    background: #D9D9D9;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    color: #46376D;
+    outline: none;
+    
+    &::placeholder {
+      color: rgba(70, 55, 109, 0.4);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(70, 55, 109, 0.2);
+    }
+    
+    @media (max-width: 550px) {
+      width: 80px;
+    }
+  }
+  
+  &__add-tag {
+    width: 44px;
+    height: 44px;
+    background: #D9D9D9;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #46376D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: darken(#D9D9D9, 10%);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  &__selected-tags {
+    background: #D9D9D9;
+    border-radius: 5px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 56px;
+  }
+  
+  &__tag {
+    background: #ACBBED;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #46376D;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  &__tag-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #46376D;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+  
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  &__cancel {
+    background: #D9D9D9;
+    color: #46376D;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 24px;
+    font-size: 48px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: darken(#D9D9D9, 8%);
+    }
+  }
+  
+  &__submit {
+    background: #46376D;
+    color: #D9D9D9;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 24px;
+    font-size: 48px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: lighten(#46376D, 10%);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}

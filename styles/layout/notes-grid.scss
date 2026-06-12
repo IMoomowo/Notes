@@ -1,0 +1,76 @@
+// styles/layout/_notes-grid.scss
+
+.notes-page {
+  margin-left: $sidebar-width;
+  padding: $spacing-xl;
+  min-height: 100vh;
+  background: $bg-page;
+  
+  @include responsive(md) {
+    margin-left: 0;
+    padding: $spacing-md;
+    padding-top: 5rem;
+  }
+}
+
+// Hero-секция — центрируем, но не ограничиваем ширину сильно
+.notes-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  margin-bottom: $spacing-2xl;
+}
+
+// Список заметок — на всю ширину
+.notes-list {
+  width: 100%;
+  padding-top: $spacing-xl;
+  border-top: 1px solid rgba($text-color, 0.1);
+  
+  @include responsive(md) {
+    padding-top: $spacing-md;
+  }
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: $text-color;
+  }
+}
+
+// ГРИД — на всю ширину, карточки растягиваются
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-lg;
+  width: 100%;
+  
+  // 3 колонки на планшетах
+  @include responsive(xl) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  // 2 колонки на маленьких планшетах
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  // 1 колонка на мобилках
+  @include responsive(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: $spacing-2xl;
+  color: $text-color;
+  opacity: 0.6;
+}

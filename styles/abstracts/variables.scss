@@ -1,0 +1,39 @@
+// styles/abstracts/_variables.scss
+
+// Цвета
+$bg-page: #F0F0F0;
+$bg-card: #FFFFFF;
+$note-card-bg: #D9D9D9;
+$text-color: #46376D;
+$tag-bg: #ACBBED;
+$tag-text: #46376D;
+$border: #E2E8F0;
+$accent: #6366F1;
+$accent-hover: #4F46E5;
+$danger: #EF4444;
+$danger-hover: #DC2626;
+
+// Отступы
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// Размеры
+$sidebar-width: 80px;
+$note-card-width: 400px;
+$note-card-height: 400px;
+
+// Тени
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+$shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+// Брейкпоинты
+$breakpoint-xl: 1400px;
+$breakpoint-lg: 1100px;
+$breakpoint-md: 768px;
+$breakpoint-sm: 500px;

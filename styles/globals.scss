@@ -1,0 +1,66 @@
+// styles/globals.scss
+@font-face {
+  font-family: 'Handjet';
+  src: url('../public/fonts/Handjet-Regular.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Применяем шрифт ко всему приложению
+* {
+  font-family: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+
+
+// 1. СНАЧАЛА ПЕРЕМЕННЫЕ (обязательно!)
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+
+// 2. КОМПОНЕНТЫ
+@import 'components/sidebar';
+@import 'components/note-card';
+@import 'components/tag-manager';
+@import 'components/modal';
+
+// 3. ЛЭЙАУТЫ
+@import 'layout/notes-grid';
+@import 'layout/form';
+
+// 4. СТРАНИЦЫ
+@import 'pages/notes';
+@import 'pages/note-detail.scss';
+@import 'pages/auth';
+@import 'pages/settings';
+
+// 5. ГЛОБАЛЬНЫЕ СТИЛИ
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: $bg-page;
+  color: $text-color;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+.loading, .empty-state {
+  text-align: center;
+  padding: $spacing-2xl;
+  color: $text-color;
+}
+
+.error-message {
+  color: $danger;
+  padding: $spacing-md;
+  border: 1px solid $danger;
+  border-radius: 5px;
+  margin-bottom: $spacing-lg;
+  background: rgba($danger, 0.05);
+}
+
+// Глобальные стили для текста

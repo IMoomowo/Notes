@@ -1,0 +1,139 @@
+.settings-page {
+  min-height: 100vh;
+  background: #F0F0F0;
+  padding: 60px 20px;
+}
+
+.settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings__title {
+  font-size: 48px;
+  font-weight: 600;
+  color: #46376D;
+  margin-bottom: 40px;
+}
+
+.settings-section {
+  margin-bottom: 48px;
+  
+  &__title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #852221;
+    margin-bottom: 20px;
+  }
+}
+
+.settings-card {
+  background: #D9D9D9;
+  border-radius: 5px;
+  padding: 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  
+  &__info {
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #46376D;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      font-size: 16px;
+      color: #46376D;
+      opacity: 0.7;
+    }
+  }
+  
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 250px;
+  }
+  
+  &__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  
+  &--danger {
+    border: 1px solid #EF4444;
+  }
+}
+
+.settings-input {
+  padding: 12px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #46376D;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(70, 55, 109, 0.1);
+  }
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid #EF4444;
+  color: #EF4444;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+.btn-danger {
+  background: #EF4444;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  
+  &:hover {
+    background: darken(#EF4444, 8%);
+  }
+}
+
+.warning-text {
+  color: #EF4444;
+  font-size: 14px;
+}
+
+.settings__message {
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  
+  &--success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+  }
+  
+  &--error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+  }
+}

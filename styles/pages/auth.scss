@@ -1,0 +1,233 @@
+// styles/pages/_auth.scss
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F0F0F0;
+  padding: $spacing-md;
+}
+
+.auth-card {
+  background: #F0F0F0;
+  width: 100%;
+  max-width: 1000px;
+  max-height: 640px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  @include responsive(md) {
+    max-width: 100%;
+    max-height: none;
+    padding: $spacing-md;
+  }
+  
+  &__title {
+    font-size: 90px;
+    font-weight: 600;
+    color: $text-color;
+    text-align: center;
+    margin-bottom: $spacing-xl;
+    line-height: 1.2;
+    
+    @include responsive(md) {
+      font-size: 48px;
+      margin-bottom: $spacing-lg;
+    }
+    
+    @include responsive(sm) {
+      font-size: 32px;
+    }
+  }
+  
+  &__error {
+    background: rgba($danger, 0.1);
+    color: $danger;
+    padding: $spacing-md;
+    border-radius: 5px;
+    margin-bottom: $spacing-lg;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: $spacing-xl;
+    
+    @include responsive(sm) {
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+  }
+  
+  &__register {
+    font-size: 0.85rem;
+    color: $text-color;
+    
+    span {
+      margin-right: 4px;
+    }
+  }
+  
+  &__link {
+    color: #852221;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  &__btn {
+    background: $text-color;
+    color: #F0F0F0;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: lighten($text-color, 10%);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Единый контейнер для полей — фиксированная высота 340px на десктопе
+.auth-fields-container {
+  background: #D9D9D9;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 340px;           // ← фиксированная высота
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;  // ← равномерное распределение
+  
+  @include responsive(md) {
+    height: auto;          // ← на мобилках высота автоматическая
+  }
+}
+
+.auth-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  
+  @include responsive(sm) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: 16px;
+  }
+  
+  &__label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #852221;
+    min-width: 80px;
+  }
+  
+  &__input {
+    flex: 1;
+    height: 54px;
+    padding: 0 16px;
+    background: #F0F0F0;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: $text-color;
+    outline: none;
+    margin-left: $spacing-md;
+    
+    @include responsive(sm) {
+      width: 100%;
+      margin-left: 0;
+    }
+    
+    &::placeholder {
+      color: rgba($text-color, 0.4);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba($text-color, 0.2);
+    }
+  }
+}
+
+// Дополнительные стили для страницы входа
+
+.auth-card__links {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 20px 12px 20px;
+  background: #D9D9D9;
+  &:last-child {
+    border-radius: 0 0 5px 5px;
+  }
+}
+
+.auth-card__link-btn {
+  background: none;
+  border: none;
+  color: #852221;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  
+  &:hover {
+    color: darken(#852221, 10%);
+  }
+}
+
+.auth-card__success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4CAF50;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.auth-card__hint {
+  color: #46376D;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-card__btn-secondary {
+  background: #D9D9D9;
+  color: #46376D;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: darken(#D9D9D9, 8%);
+  }
+}
+
+.auth-card__loading {
+  text-align: center;
+  padding: 40px;
+  color: #46376D;
+  font-size: 1.1rem;
+}
