@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
 export default function UpdatePasswordPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -14,7 +15,31 @@ export default function UpdatePasswordPage() {
 
   useEffect(() => {
     const handleRecovery = async () => {
-      // Получаем hash из URL
+      console.log('=== UPDATE PASSWORD PAGE ===')
+      
+      // 1. Проверяем query параметры (токен из ссылки recovery)
+      const token = searchParams.get('token')
+      const type = searchParams.get('type')
+      console.log('Query token:', token)
+      console.log('Query type:', type)
+      
+      if (token && type === 'recovery') {
+        console.log('Attempting to verify recovery token...')
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'recovery'
+        })
+        
+        if (!error) {
+          console.log('Recovery token verified successfully')
+          setProcessing(false)
+          return
+        } else {
+          console.error('VerifyOtp error:', error)
+        }
+      }
+      
+      // 2. Проверяем hash параметры (access_token)
       const hash = window.location.hash
       console.log('Hash:', hash)
       
@@ -22,9 +47,8 @@ export default function UpdatePasswordPage() {
         const params = new URLSearchParams(hash.substring(1))
         const accessToken = params.get('access_token')
         const refreshToken = params.get('refresh_token')
-        const type = params.get('type')
         
-        console.log('Type:', type)
+        console.log('Access token from hash:', !!accessToken)
         
         if (accessToken && refreshToken) {
           const { error } = await supabase.auth.setSession({
@@ -33,25 +57,30 @@ export default function UpdatePasswordPage() {
           })
           
           if (!error) {
-            console.log('Session set successfully')
+            console.log('Session set from hash successfully')
             setProcessing(false)
             return
           }
         }
       }
       
-      // Проверяем существующую сессию
+      // 3. Проверяем существующую сессию
       const { data: { user } } = await supabase.auth.getUser()
+      console.log('Existing user:', user?.email)
+      
       if (user) {
         setProcessing(false)
-      } else {
-        setError('Недействительная или просроченная ссылка')
-        setTimeout(() => router.push('/sign-in'), 3000)
+        return
       }
+      
+      // 4. Ничего не сработало
+      console.log('No valid recovery method found')
+      setError('Недействительная или просроченная ссылка')
+      setTimeout(() => router.push('/sign-in'), 3000)
     }
     
     handleRecovery()
-  }, [router])
+  }, [router, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
