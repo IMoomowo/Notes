@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import { User } from '@/types/user'
 
 export default function UpdatePasswordPage() {
   const router = useRouter()
@@ -11,24 +10,6 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-
-  // Проверяем, что пользователь авторизован (через magic link)
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/sign-in')
-      } else {
-        setUser({
-          id: user.id,
-          email: user.email || '',
-          created_at: user.created_at || ''
-        })
-      }
-    }
-    getUser()
-  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,25 +35,14 @@ export default function UpdatePasswordPage() {
       if (error) throw error
 
       await supabase.auth.signOut()
-    
-    alert('Пароль успешно обновлён! Войдите с новым паролем.')
-    router.push('/sign-in')
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Ошибка обновления пароля')
-  } finally {
-    setLoading(false)
-  }
-}
-
-  if (!user) {
-    return (
-      <div className="auth-page">
-        <div className="auth-card">
-          <h1 className="auth-card__title">Проверка</h1>
-          <div className="auth-card__loading">Пожалуйста, подождите...</div>
-        </div>
-      </div>
-    )
+      
+      alert('Пароль успешно обновлён! Войдите с новым паролем.')
+      router.push('/sign-in')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка обновления пароля')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

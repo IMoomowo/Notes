@@ -51,11 +51,11 @@ export default function SignIn() {
     try {
       // Отправляем magic link, который сразу перенаправит на update-password
       const { error } = await supabase.auth.signInWithOtp({
-        email: resetEmail,
-        options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/update-password`,
-        }
-      })
+  email: resetEmail,
+  options: {
+    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://твой-проект.vercel.app'}/auth/callback`,
+  }
+})
 
       if (error) throw error
 
