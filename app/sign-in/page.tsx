@@ -39,38 +39,35 @@ export default function SignIn() {
   }
 
   async function handleMagicLinkReset(e: React.FormEvent) {
-    e.preventDefault()
-    if (!resetEmail.trim()) {
-      setResetMessage('Введите email')
-      return
-    }
-
-    setResetLoading(true)
-    setResetMessage(null)
-
-    try {
-      // Отправляем magic link, который сразу перенаправит на update-password
-      const { error } = await supabase.auth.signInWithOtp({
-  email: resetEmail,
-  options: {
-    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://твой-проект.vercel.app'}/auth/callback`,
+  e.preventDefault()
+  if (!resetEmail.trim()) {
+    setResetMessage('Введите email')
+    return
   }
-})
 
-      if (error) throw error
+  setResetLoading(true)
+  setResetMessage(null)
 
-      setResetMessage('✨ Волшебная ссылка отправлена! Перейдите по ней, чтобы установить новый пароль.')
-      setTimeout(() => {
-        setResetMode(false)
-        setResetEmail('')
-        setResetMessage(null)
-      }, 4000)
-    } catch (err) {
-      setResetMessage(err instanceof Error ? err.message : 'Ошибка отправки ссылки')
-    } finally {
-      setResetLoading(false)
-    }
+  try {
+    // Используем resetPasswordForEmail вместо signInWithOtp
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://notes-lovat-eta-35.vercel.app'}/update-password`,
+    })
+
+    if (error) throw error
+
+    setResetMessage('✨ Ссылка для восстановления пароля отправлена! Проверьте почту.')
+    setTimeout(() => {
+      setResetMode(false)
+      setResetEmail('')
+      setResetMessage(null)
+    }, 4000)
+  } catch (err) {
+    setResetMessage(err instanceof Error ? err.message : 'Ошибка отправки ссылки')
+  } finally {
+    setResetLoading(false)
   }
+}
 
   if (resetMode) {
     return (
