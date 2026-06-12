@@ -38,7 +38,7 @@ export default function SignIn() {
     }
   }
 
-  async function handleMagicLinkReset(e: React.FormEvent) {
+async function handleMagicLinkReset(e: React.FormEvent) {
   e.preventDefault()
   if (!resetEmail.trim()) {
     setResetMessage('Введите email')
@@ -49,9 +49,11 @@ export default function SignIn() {
   setResetMessage(null)
 
   try {
-    // Используем resetPasswordForEmail вместо signInWithOtp
+    // Явно указываем полный URL с /update-password
+    const redirectUrl = 'https://notes-lovat-eta-35.vercel.app/update-password'
+    
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://notes-lovat-eta-35.vercel.app'}/update-password`,
+      redirectTo: redirectUrl,
     })
 
     if (error) throw error
