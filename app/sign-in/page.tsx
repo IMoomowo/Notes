@@ -53,7 +53,7 @@ export default function SignIn() {
       const { error } = await supabase.auth.signInWithOtp({
         email: resetEmail,
         options: {
-          emailRedirectTo: `${window.location.origin}/update-password`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/update-password`,
         }
       })
 

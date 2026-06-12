@@ -53,15 +53,16 @@ export default function UpdatePasswordPage() {
 
       if (error) throw error
 
-      alert('Пароль успешно обновлён! Войдите с новым паролем.')
       await supabase.auth.signOut()
-      router.push('/sign-in')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления пароля')
-    } finally {
-      setLoading(false)
-    }
+    
+    alert('Пароль успешно обновлён! Войдите с новым паролем.')
+    router.push('/sign-in')
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Ошибка обновления пароля')
+  } finally {
+    setLoading(false)
   }
+}
 
   if (!user) {
     return (
