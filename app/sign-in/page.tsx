@@ -49,7 +49,8 @@ async function handleMagicLinkReset(e: React.FormEvent) {
   setResetMessage(null)
 
   try {
-    const response = await fetch('http://localhost:5000/api/password/reset-request', {
+    // Вызываем ТВОЙ API, а не Supabase
+    const response = await fetch('/api/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: resetEmail })
