@@ -9,65 +9,61 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
     const handleCallback = async () => {
-      console.log('1. AuthCallback mounted')
-      
-      // Получаем hash из URL (например, #access_token=...)
+      // Извлекаем hash параметры из URL на клиенте
       const hash = window.location.hash
-      console.log('2. Hash from URL:', hash)
       
       if (hash && hash.includes('access_token')) {
-        // Извлекаем токены из hash
         const params = new URLSearchParams(hash.substring(1))
         const accessToken = params.get('access_token')
         const refreshToken = params.get('refresh_token')
         
-        console.log('3. Access token exists:', !!accessToken)
-        console.log('4. Refresh token exists:', !!refreshToken)
-        
         if (accessToken && refreshToken) {
           try {
-            // Устанавливаем сессию вручную
-            const { data, error } = await supabase.auth.setSession({
+            // Устанавливаем сессию Supabase вручную из полученных токенов
+            const { data, error: sessionError } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken
             })
             
-            console.log('5. SetSession result:', { data, error })
-            
-            if (!error && data.session) {
-              console.log('6. Session set successfully')
-              // Успешно вошли → перенаправляем на страницу смены пароля
+            if (!sessionError && data.session) {
+              // Успешная авторизация → отправляем на страницу обновления пароля
               router.push('/update-password')
               return
-            } else {
-              console.error('SetSession error:', error)
             }
           } catch (err) {
-            console.error('Exception in setSession:', err)
+            console.error('Исключение при установке сессии:', err)
           }
         }
       }
       
-      // Если нет hash или нет токенов — пробуем через getUser
-      console.log('7. Trying getUser fallback')
-      const { data: { user } } = await supabase.auth.getUser()
-      console.log('8. User from getUser:', user?.email)
-      
-      if (user) {
-        router.push('/update-password')
-        return
+      // Запасной вариант: если токенов в hash нет, проверяем текущую сессию пользователя
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          router.push('/update-password')
+          return
+        }
+      } catch (err) {
+        console.error('Ошибка проверки пользователя:', err)
       }
       
-      // Если всё равно не получилось — на страницу входа с ошибкой
-      console.log('9. Redirecting to sign-in with error')
-      setError('Не удалось войти. Попробуйте запросить ссылку ещё раз.')
-      setTimeout(() => {
+      // Если войти так и не удалось — показываем ошибку и возвращаем на страницу входа
+      setError('Не удалось войти. Пожалуйста, запросите ссылку восстановления пароля ещё раз.')
+      
+      timeoutId = setTimeout(() => {
         router.push('/sign-in')
       }, 3000)
     }
     
     handleCallback()
+
+    // Функция очистки (вызывается при размонтировании компонента)
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [router])
 
   if (error) {

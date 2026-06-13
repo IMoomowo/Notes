@@ -1,16 +1,5 @@
 // styles/components/_sidebar.scss
 
-// Переменные (если нет в abstracts)
-$sidebar-width: 80px;
-$sidebar-width-mobile: 260px;
-$bg-card: #FFFFFF;
-$border: #E2E8F0;
-$bg-page: #F0F0F0;
-$accent: #6366F1;
-$danger: #EF4444;
-$text-primary: #1E293B;
-
-// Кнопка-гамбургер (только на мобилках)
 .mobile-menu-toggle {
   display: none;
   position: fixed;
@@ -27,21 +16,20 @@ $text-primary: #1E293B;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  
+
   @media (max-width: 768px) {
     display: flex;
   }
 }
 
-// Сайдбар
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
-  width: $sidebar-width;
+  width: 80px;
   height: 100vh;
-  background: $bg-card;
-  border-right: 1px solid $border;
+  background: #FFFFFF;
+  border-right: 1px solid #E2E8F0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,19 +37,22 @@ $text-primary: #1E293B;
   padding: 2rem 0;
   z-index: 100;
   transition: transform 0.3s ease;
-  
-  // Логотип
- &__logo {
+
+  &__logo {
     flex-shrink: 0;
-    margin-bottom: 0;
-    
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     svg {
       display: block;
+      width: 30px;
+      height: 30px;
     }
   }
-  
-  // Навигация (иконки друг за другом)
-   &__nav {
+
+  &__nav {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -70,9 +61,9 @@ $text-primary: #1E293B;
     justify-content: flex-start;
     margin-top: 1rem;
   }
-  
-  // Общий стиль иконок
-  &__icon {
+
+  &__icon,
+  &__tag-manager-wrapper button {
     font-size: 1.8rem;
     background: none;
     border: none;
@@ -83,65 +74,35 @@ $text-primary: #1E293B;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $text-primary;
+    color: #1E293B;
     border-radius: 12px;
     transition: background 0.2s;
-    
+
     &:hover {
-      background: $bg-page;
-    }
-    
-    &--logout {
-      color: $danger;
-      flex-shrink: 0;
+      background: #F0F0F0;
     }
   }
-  
-  // Обёртка для TagManager (чтобы иконка была в той же стилистике)
-  &__tag-manager-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    button {
-      font-size: 1.8rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      
-      &:hover {
-        background: $bg-page;
-      }
-    }
+
+  &__icon--logout {
+    color: #EF4444;
+    flex-shrink: 0;
   }
-  
-  // Мобильная версия — выезжает слева
+
   @media (max-width: 768px) {
-    width: $sidebar-width-mobile;
+    width: 260px;
     transform: translateX(-100%);
     box-shadow: none;
-    
+
     &--open {
       transform: translateX(0);
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
-    
+
     &__nav {
       gap: 2rem;
     }
-    
-    &__icon {
-      width: 56px;
-      height: 56px;
-      font-size: 2rem;
-    }
-    
+
+    &__icon,
     &__tag-manager-wrapper button {
       width: 56px;
       height: 56px;
@@ -150,7 +111,6 @@ $text-primary: #1E293B;
   }
 }
 
-// Затемнение для мобильного меню
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -160,16 +120,15 @@ $text-primary: #1E293B;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 99;
-  
+
   @media (max-width: 768px) {
     display: block;
   }
 }
 
-// Корректировка основного контента под сайдбар
-.main-content {
-  flex: 1;
-  margin-left: $sidebar-width;
+.main-content,
+.notes-page {
+  margin-left: 80px;
   
   @media (max-width: 768px) {
     margin-left: 0;
@@ -177,27 +136,12 @@ $text-primary: #1E293B;
 }
 
 .notes-page {
-  margin-left: $sidebar-width;
   padding: 2rem;
   min-height: 100vh;
-  background: $bg-page;
-  
+  background: #F0F0F0;
+
   @media (max-width: 768px) {
-    margin-left: 0;
     padding: 1rem;
     padding-top: 5rem;
-  }
-}
-
-.sidebar__logo {
-  margin-bottom: $spacing-md;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  svg {
-    width: 30px;
-    height: 30px;
-    display: block;
   }
 }

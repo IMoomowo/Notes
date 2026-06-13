@@ -1,19 +1,35 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
 .settings-page {
   min-height: 100vh;
-  background: #F0F0F0;
+  background-color: $bg-page;
   padding: 60px 20px;
+  
+  @media (max-width: 768px) {
+    padding: 30px 16px;
+  }
 }
 
 .settings-container {
   max-width: 800px;
   margin: 0 auto;
 }
-
+.my-element {
+  color: $primary-color;
+}
 .settings__title {
+  font-family: 'Handjet', sans-serif;
   font-size: 48px;
   font-weight: 600;
-  color: #46376D;
+  color: $primary-color; // Используем переменную проекта вместо #46376D
   margin-bottom: 40px;
+  letter-spacing: 0.5px;
+  
+  @media (max-width: 768px) {
+    font-size: 36px;
+    margin-bottom: 24px;
+  }
 }
 
 .settings-section {
@@ -22,13 +38,13 @@
   &__title {
     font-size: 24px;
     font-weight: 600;
-    color: #852221;
+    color: #852221; 
     margin-bottom: 20px;
   }
 }
 
 .settings-card {
-  background: #D9D9D9;
+  background-color: #D9D9D9; // Используем переменную проекта вместо #D9D9D9
   border-radius: 5px;
   padding: 24px;
   margin-bottom: 20px;
@@ -37,18 +53,29 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 16px;
+  }
   
   &__info {
+    flex: 1;
+    min-width: 200px;
+
     h3 {
       font-size: 20px;
       font-weight: 600;
-      color: #46376D;
+      color: $primary-color;
       margin-bottom: 8px;
     }
     
     p {
       font-size: 16px;
-      color: #46376D;
+      color: $primary-color;
       opacity: 0.7;
     }
   }
@@ -57,7 +84,12 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    flex: 1;
     min-width: 250px;
+    
+    @media (max-width: 480px) {
+      min-width: 100%;
+    }
   }
   
   &__actions {
@@ -67,73 +99,129 @@
   }
   
   &--danger {
-    border: 1px solid #EF4444;
+    border: 1px solid $danger;
   }
 }
 
 .settings-input {
+  width: 100%;
   padding: 12px;
-  background: white;
-  border: 1px solid #ccc;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
   border-radius: 5px;
   font-size: 16px;
+  color: $text-color;
+  transition: border-color 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+// СТИЛИ КНОПОК НАСТРОЕК
+.btn-primary {
+  background-color: $primary-color;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: darken($primary-color, 8%);
+  }
+}
+
+.btn-secondary {
+  background-color: #cccccc;
+  color: #333333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: darken(#cccccc, 8%);
+  }
 }
 
 .btn-outline {
-  background: transparent;
-  border: 1px solid #46376D;
+  background-color: transparent;
+  border: 1px solid $primary-color;
+  color: $primary-color;
   padding: 10px 20px;
   border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
   
   &:hover {
-    background: rgba(70, 55, 109, 0.1);
+    background-color: rgba($primary-color, 0.1);
   }
 }
 
 .btn-danger-outline {
-  background: transparent;
-  border: 1px solid #EF4444;
-  color: #EF4444;
+  background-color: transparent;
+  border: 1px solid $danger;
+  color: $danger;
   padding: 10px 20px;
   border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
   
   &:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background-color: rgba($danger, 0.1);
   }
 }
 
 .btn-danger {
-  background: #EF4444;
-  color: white;
+  background-color: $danger;
+  color: #ffffff;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s ease;
   
   &:hover {
-    background: darken(#EF4444, 8%);
+    background-color: darken($danger, 8%);
   }
 }
 
 .warning-text {
-  color: #EF4444;
+  color: $danger;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .settings__message {
   padding: 12px;
   border-radius: 5px;
   margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 500;
   
   &--success {
-    background: rgba(76, 175, 80, 0.1);
+    background-color: rgba(76, 175, 80, 0.1);
     color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.2);
   }
   
   &--error {
-    background: rgba(239, 68, 68, 0.1);
-    color: #EF4444;
+    background-color: rgba($danger, 0.1);
+    color: $danger;
+    border: 1px solid rgba($danger, 0.2);
   }
 }

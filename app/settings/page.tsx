@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
 import { resetPassword, deleteAccount } from '@/lib/auth'
 import SidebarLayout from '../sidebar-layout'
 

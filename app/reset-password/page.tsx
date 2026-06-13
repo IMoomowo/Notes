@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 function ResetPasswordForm() {
@@ -13,13 +13,24 @@ function ResetPasswordForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Очищаем таймер при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   if (!token) {
     return (
       <div className="auth-page">
         <div className="auth-card">
           <h1 className="auth-card__title">Ошибка</h1>
-          <p>Недействительная ссылка</p>
+          <p>Недействительная или устаревшая ссылка для восстановления.</p>
           <button onClick={() => router.push('/sign-in')} className="auth-card__btn">
             Вернуться ко входу
           </button>
@@ -58,7 +69,11 @@ function ResetPasswordForm() {
       }
 
       setSuccess(true)
-      setTimeout(() => router.push('/sign-in'), 2000)
+      
+      // Безопасный переход с сохранением ссылки на таймер
+      timeoutRef.current = setTimeout(() => {
+        router.push('/sign-in')
+      }, 2000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сброса пароля')
     } finally {

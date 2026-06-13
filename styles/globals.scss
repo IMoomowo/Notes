@@ -1,66 +1,212 @@
-// styles/globals.scss
+// 1. ПОДКЛЮЧЕНИЕ ШРИФТОВ
+
+// В Next.js папка public является корневой для статических файлов,
+
+// поэтому путь пишется напрямую от корня /
+
 @font-face {
+
   font-family: 'Handjet';
+
   src: url('../public/fonts/Handjet-Regular.ttf') format('truetype');
+
   font-weight: 100 900;
+
   font-style: normal;
+
   font-display: swap;
+
 }
+
+
 
 // Применяем шрифт ко всему приложению
+
 * {
+
   font-family: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
 }
 
 
 
-// 1. СНАЧАЛА ПЕРЕМЕННЫЕ (обязательно!)
+// 2. СБРОС СТИЛЕЙ (Reset / Normalize)
+
+* {
+
+  margin: 0;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+}
+
+
+
+// 3. ИМПОРТ ПЕРЕМЕННЫХ И МИКСИНОВ
+
 @import 'abstracts/variables';
+
 @import 'abstracts/mixins';
 
-// 2. КОМПОНЕНТЫ
-@import 'components/sidebar';
-@import 'components/note-card';
-@import 'components/tag-manager';
-@import 'components/modal';
 
-// 3. ЛЭЙАУТЫ
-@import 'layout/notes-grid';
-@import 'layout/form';
 
-// 4. СТРАНИЦЫ
-@import 'pages/notes';
-@import 'pages/note-detail.scss';
-@import 'pages/auth';
-@import 'pages/settings';
-
-// 5. ГЛОБАЛЬНЫЕ СТИЛИ
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+// Применяем базовые стили к body
 
 body {
+
   background-color: $bg-page;
+
   color: $text-color;
+
+  // Системный шрифт для идеальной читаемости основного текста заметок
+
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
   line-height: 1.5;
+
+  -webkit-font-smoothing: antialiased;
+
+  -moz-osx-font-smoothing: grayscale;
+
 }
+
+
+
+// Применяем акцентный декоративный шрифт Handjet к заголовкам и логотипам
+
+h1, h2, h3, h4, h5, h6, .app-logo, .handjet-font {
+
+  font-family: 'Handjet', system-ui, -apple-system, sans-serif;
+
+}
+
+
+
+// 4. ИМПОРТ КОМПОНЕНТОВ
+
+@import 'components/sidebar';
+
+@import 'components/note-card';
+
+@import 'components/modal';
+
+
+
+// 5. ИМПОРТ LAYOUTS (Сетки и формы)
+
+@import 'layout/notes-grid';
+
+@import 'layout/form';
+
+
+
+// 6. ИМПОРТ СТРАНИЦ
+
+@import 'pages/notes';
+
+@import 'pages/note-detail';
+
+@import 'pages/auth';
+
+@import 'pages/settings';
+
+
+
+// 7. СЛУЖЕБНЫЕ И ГЛОБАЛЬНЫЕ СТИЛИ
+
+
 
 .loading, .empty-state {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
   text-align: center;
+
   padding: $spacing-2xl;
+
   color: $text-color;
+
+  font-size: 1.1rem;
+
 }
+
+
 
 .error-message {
+
   color: $danger;
+
   padding: $spacing-md;
+
   border: 1px solid $danger;
+
   border-radius: 5px;
+
   margin-bottom: $spacing-lg;
+
   background: rgba($danger, 0.05);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  font-size: 0.95rem;
+
 }
 
-// Глобальные стили для текста
+
+
+// Стили для экрана перенаправления (используется в корневой page.tsx)
+
+.redirect-loader {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-height: 100vh;
+
+  background-color: $bg-page;
+
+  
+
+  &__text {
+
+    font-family: 'Handjet', sans-serif;
+
+    font-size: 2rem;
+
+    color: $text-color;
+
+    letter-spacing: 1px;
+
+    animation: pulse 1.5s infinite ease-in-out;
+
+  }
+
+}
+
+
+
+@keyframes pulse {
+
+  0%, 100% { opacity: 0.6; }
+
+  50% { opacity: 1; }
+
+}
+
+
+

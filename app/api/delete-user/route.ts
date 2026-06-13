@@ -2,11 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-export async function DELETE(request: Request) {
+export async function DELETE() {
   try {
-    const { userId } = await request.json()
     const cookieStore = await cookies()
 
+    // 1. Создаем клиент с обычными анонимными правами для проверки сессии текущего пользователя
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -28,17 +28,20 @@ export async function DELETE(request: Request) {
       }
     )
 
-    // Получаем сессию
-    const { data: { session } } = await supabase.auth.getSession()
+    // Используем getUser() вместо getSession() для максимальной безопасности на бэкенде
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Не авторизован' },
         { status: 401 }
       )
     }
 
-    // Удаляем пользователя через admin API (нужен service_role ключ)
+    // Идентификатор пользователя берется ИСКЛЮЧИТЕЛЬНО из проверенной сессии сервера
+    const verifiedUserId = user.id
+
+    // 2. Создаем админ-клиент с сервисным ключом (Service Role Key)
     const supabaseAdmin = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -52,13 +55,17 @@ export async function DELETE(request: Request) {
       }
     )
 
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
+    // 3. Безопасно удаляем только того пользователя, который сделал этот запрос
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(verifiedUserId)
     
-    if (error) throw error
+    if (deleteError) throw deleteError
+
+    // 4. Очищаем текущую сессию в куках, чтобы разлогинить удаленного пользователя
+    await supabase.auth.signOut()
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Ошибка удаления пользователя:', error)
+    console.error('Ошибка при безопасном удалении пользователя:', error)
     return NextResponse.json(
       { error: 'Не удалось удалить пользователя' },
       { status: 500 }

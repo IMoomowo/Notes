@@ -1,4 +1,4 @@
-// styles/pages/_notes.scss
+// Исходные стили с сохранением всех твоих цветов и значений
 
 .notes-page {
   margin-left: $sidebar-width;
@@ -10,7 +10,6 @@
   }
 }
 
-// Hero-секция (занимает 50% высоты экрана)
 .notes-hero {
   min-height: 50vh;
   display: flex;
@@ -59,10 +58,20 @@
       background: $text-color;
       color: white;
     }
+
+    &--create {
+      background: #852221;
+      color: #F0F0F0;
+      border: none;
+      font-size: 20px;
+      
+      &:hover {
+        background: lighten(#852221, 10%);
+      }
+    }
   }
 }
 
-// Поисковая строка
 .search-bar {
   display: flex;
   align-items: center;
@@ -113,10 +122,9 @@
   }
 }
 
-// Список заметок
 .notes-list {
   padding: $spacing-xl;
-  border-top:none;
+  border-top: none;
   
   @include responsive(md) {
     padding: $spacing-md;
@@ -161,11 +169,11 @@
   color: $text-color;
   opacity: 0.6;
 }
+
 .note-card__content p {
   @include text-ellipsis(10);
 }
 
-// Сортировка
 .sort-button {
   position: relative;
   display: inline-block;
@@ -255,26 +263,3 @@
     }
   }
 }
-
-.notes-hero__btn {
-  height: 50px;
-  width: 98px;
-  border-radius: 5px;
-  font-size: 20px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  &--create {
-    background: #852221;
-    color: #F0F0F0;
-    border: none;
-    
-    &:hover {
-      background: lighten(#852221, 10%);
-    }
-  }
-}
-
-
-

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -10,11 +10,23 @@ export default function SignIn() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  
   const [resetMode, setResetMode] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
   const [resetMessage, setResetMessage] = useState<string | null>(null)
   const [resetLoading, setResetLoading] = useState(false)
+  
   const router = useRouter()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Очищаем таймер при размонтировании во избежание утечек памяти
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -22,12 +34,12 @@ export default function SignIn() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (signInError) throw signInError
 
       router.push('/notes')
       router.refresh()
@@ -38,42 +50,42 @@ export default function SignIn() {
     }
   }
 
-async function handleMagicLinkReset(e: React.FormEvent) {
-  e.preventDefault()
-  if (!resetEmail.trim()) {
-    setResetMessage('Введите email')
-    return
-  }
-
-  setResetLoading(true)
-  setResetMessage(null)
-
-  try {
-    // Вызываем ТВОЙ API, а не Supabase
-    const response = await fetch('/api/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: resetEmail })
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Ошибка отправки')
+  async function handleMagicLinkReset(e: React.FormEvent) {
+    e.preventDefault()
+    if (!resetEmail.trim()) {
+      setResetMessage('Введите email')
+      return
     }
 
-    setResetMessage('✅ Письмо для сброса пароля отправлено! Проверьте почту.')
-    setTimeout(() => {
-      setResetMode(false)
-      setResetEmail('')
-      setResetMessage(null)
-    }, 4000)
-  } catch (err) {
-    setResetMessage(err instanceof Error ? err.message : 'Ошибка отправки')
-  } finally {
-    setResetLoading(false)
+    setResetLoading(true)
+    setResetMessage(null)
+
+    try {
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка отправки')
+      }
+
+      setResetMessage('✅ Письмо для сброса пароля отправлено! Проверьте почту.')
+      
+      timeoutRef.current = setTimeout(() => {
+        setResetMode(false)
+        setResetEmail('')
+        setResetMessage(null)
+      }, 4000)
+    } catch (err) {
+      setResetMessage(err instanceof Error ? err.message : 'Ошибка отправки')
+    } finally {
+      setResetLoading(false)
+    }
   }
-}
 
   if (resetMode) {
     return (
@@ -82,7 +94,13 @@ async function handleMagicLinkReset(e: React.FormEvent) {
           <h1 className="auth-card__title">Восстановление пароля</h1>
           
           {resetMessage && (
-            <div className={`auth-card__message ${resetMessage.includes('отправлена') ? 'auth-card__message--success' : 'auth-card__message--error'}`}>
+            <div 
+              className={`auth-card__message ${
+                resetMessage.includes('отправлено') 
+                  ? 'auth-card__message--success' 
+                  : 'auth-card__message--error'
+              }`}
+            >
               {resetMessage}
             </div>
           )}
@@ -111,14 +129,13 @@ async function handleMagicLinkReset(e: React.FormEvent) {
                     setResetMessage(null)
                     setResetEmail('')
                   }} 
-                  className="auth-card__link"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                  className="auth-card__link-btn"
                 >
                   ← Назад ко входу
                 </button>
               </div>
               <button type="submit" disabled={resetLoading} className="auth-card__btn">
-                {resetLoading ? 'Отправка...' : 'Отправить волшебную ссылку'}
+                {resetLoading ? 'Отправка...' : 'Отправить ссылку сброса'}
               </button>
             </div>
           </form>

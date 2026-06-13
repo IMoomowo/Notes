@@ -1,4 +1,5 @@
 // styles/abstracts/_mixins.scss
+@import 'variables';
 
 // Центрирование flex
 @mixin flex-center {
@@ -53,13 +54,13 @@
   @if $breakpoint == xl {
     @media (max-width: $breakpoint-xl) { @content; }
   }
-  @if $breakpoint == lg {
+  @else if $breakpoint == lg {
     @media (max-width: $breakpoint-lg) { @content; }
   }
-  @if $breakpoint == md {
+  @else if $breakpoint == md {
     @media (max-width: $breakpoint-md) { @content; }
   }
-  @if $breakpoint == sm {
+  @else if $breakpoint == sm {
     @media (max-width: $breakpoint-sm) { @content; }
   }
 }

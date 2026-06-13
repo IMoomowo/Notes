@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { Tag } from '@/types/tag'
-import '@/styles/components/tag-manager.scss'
 
 interface TagManagerProps {
   onTagsChange: () => void
