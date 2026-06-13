@@ -12,43 +12,67 @@ function UpdatePasswordForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [isValidSession, setIsValidSession] = useState(false)
+  const [isValidSession, setIsValidSession] = useState<boolean | null>(null)
 
   useEffect(() => {
-    // Проверяем, есть ли активная сессия восстановления
-    const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+    const handleRecoverySession = async () => {
+      console.log('🔍 Проверка сессии восстановления...')
       
-      if (user) {
-        setIsValidSession(true)
-      } else {
-        // Проверяем hash параметры (если Supabase перенаправил сюда)
-        const hash = window.location.hash
-        if (hash && hash.includes('access_token')) {
-          const params = new URLSearchParams(hash.substring(1))
-          const accessToken = params.get('access_token')
-          const refreshToken = params.get('refresh_token')
-          
-          if (accessToken && refreshToken) {
-            const { error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken
-            })
-            
-            if (!error) {
-              setIsValidSession(true)
-              return
-            }
-          }
-        }
+      // Получаем hash из URL (то, что после #)
+      const hash = window.location.hash
+      console.log('📍 Hash из URL:', hash)
+      
+      // Если есть hash с access_token, обрабатываем его
+      if (hash && hash.includes('access_token')) {
+        console.log('🔄 Найден access_token в hash, устанавливаем сессию...')
         
-        // Если нет сессии, перенаправляем
-        setTimeout(() => router.push('/sign-in'), 3000)
-        setError('Ссылка для восстановления недействительна или истекла. Перенаправление...')
+        const params = new URLSearchParams(hash.substring(1))
+        const accessToken = params.get('access_token')
+        const refreshToken = params.get('refresh_token')
+        
+        if (accessToken && refreshToken) {
+          // Устанавливаем сессию из hash параметров
+          const { data, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          })
+          
+          if (sessionError) {
+            console.error('❌ Ошибка установки сессии:', sessionError)
+            setError('Ссылка для восстановления недействительна или истекла.')
+            setTimeout(() => router.push('/sign-in'), 3000)
+            setIsValidSession(false)
+            return
+          }
+          
+          console.log('✅ Сессия установлена, пользователь:', data.user?.email)
+          setIsValidSession(true)
+          return
+        }
       }
+      
+      // Если нет hash, проверяем существующую сессию
+      console.log('🔍 Проверяем существующую сессию...')
+      const { data: { session }, error: sessionCheckError } = await supabase.auth.getSession()
+      
+      if (sessionCheckError) {
+        console.error('❌ Ошибка проверки сессии:', sessionCheckError)
+      }
+      
+      if (session) {
+        console.log('✅ Найдена активная сессия, пользователь:', session.user.email)
+        setIsValidSession(true)
+        return
+      }
+      
+      // Если ничего не подошло
+      console.log('❌ Нет действительной сессии')
+      setError('Ссылка для восстановления недействительна или истекла. Запросите сброс пароля заново.')
+      setTimeout(() => router.push('/sign-in'), 4000)
+      setIsValidSession(false)
     }
     
-    checkSession()
+    handleRecoverySession()
   }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,25 +92,36 @@ function UpdatePasswordForm() {
     setError(null)
 
     try {
+      console.log('🔄 Обновление пароля...')
+      
+      // Обновляем пароль
       const { error: updateError } = await supabase.auth.updateUser({
         password: password
       })
 
-      if (updateError) throw updateError
+      if (updateError) {
+        console.error('❌ Ошибка обновления:', updateError)
+        throw updateError
+      }
 
+      console.log('✅ Пароль успешно обновлен!')
       setSuccess(true)
       
-      // Не выходим из системы сразу, даем пользователю понять что все ок
-      setTimeout(() => {
+      // Выходим из системы через 2 секунды
+      setTimeout(async () => {
+        await supabase.auth.signOut()
         router.push('/sign-in')
-      }, 3000)
+      }, 2000)
+      
     } catch (err) {
+      console.error('❌ Ошибка:', err)
       setError(err instanceof Error ? err.message : 'Ошибка обновления пароля')
       setLoading(false)
     }
   }
 
-  if (!isValidSession && !error) {
+  // Показываем загрузку, пока проверяем сессию
+  if (isValidSession === null) {
     return (
       <div className="auth-page">
         <div className="auth-card">
@@ -97,6 +132,22 @@ function UpdatePasswordForm() {
     )
   }
 
+  // Если сессия недействительна
+  if (isValidSession === false) {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <h1 className="auth-card__title">Ошибка</h1>
+          {error && <div className="auth-card__error">❌ {error}</div>}
+          <button onClick={() => router.push('/sign-in')} className="auth-card__btn">
+            Вернуться ко входу
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Форма смены пароля
   return (
     <div className="auth-page">
       <div className="auth-card">
@@ -121,6 +172,7 @@ function UpdatePasswordForm() {
                   required
                   placeholder="••••••••"
                   minLength={6}
+                  autoComplete="new-password"
                 />
               </div>
               
@@ -134,6 +186,7 @@ function UpdatePasswordForm() {
                   required
                   placeholder="••••••••"
                   minLength={6}
+                  autoComplete="new-password"
                 />
               </div>
             </div>
