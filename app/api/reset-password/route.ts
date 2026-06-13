@@ -1,10 +1,6 @@
+// app/api/auth/forgot-password/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 export async function POST(request: Request) {
   try {
@@ -17,34 +13,40 @@ export async function POST(request: Request) {
       )
     }
 
-    const normalizedEmail = email.trim().toLowerCase()
-
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      'http://localhost:3000'
-
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      normalizedEmail,
-      {
-        redirectTo: `${baseUrl}/reset-password`,
-      }
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
+    
+    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/update-password`
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    })
 
     if (error) {
-      console.error(error)
+      console.error('Supabase error:', error)
+      return NextResponse.json({
+        message: 'Если адрес зарегистрирован, вы получите письмо для сброса пароля'
+      })
     }
 
-    // Защита от user enumeration
     return NextResponse.json({
-      message:
-        'Если адрес зарегистрирован, письмо со ссылкой для сброса будет отправлено.',
+      message: 'Если адрес зарегистрирован, вы получите письмо для сброса пароля'
     })
   } catch (error) {
-    console.error('Ошибка сброса пароля:', error)
-
+    console.error('Server error:', error)
     return NextResponse.json(
       { error: 'Внутренняя ошибка сервера' },
       { status: 500 }
     )
   }
+}
+
+// Опционально: обрабатываем GET запросы
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Метод не поддерживается' },
+    { status: 405 }
+  )
 }

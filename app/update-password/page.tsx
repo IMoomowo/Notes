@@ -1,90 +1,55 @@
+// app/update-password/page.tsx
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
 function UpdatePasswordForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [processing, setProcessing] = useState(true)
-  
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [isValidSession, setIsValidSession] = useState(false)
 
   useEffect(() => {
-    const handleRecovery = async () => {
-      // 1. Проверяем query параметры (токен из ссылки recovery)
-      const token = searchParams.get('token')
-      const type = searchParams.get('type')
+    // Проверяем, есть ли активная сессия восстановления
+    const checkSession = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
       
-      if (token && type === 'recovery') {
-        const { error: verifyError } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'recovery'
-        })
-        
-        if (!verifyError) {
-          setProcessing(false)
-          return
-        } else {
-          console.error('Ошибка проверки Recovery токена:', verifyError)
-        }
-      }
-      
-      // 2. Проверяем hash параметры (access_token)
-      const hash = window.location.hash
-      
-      if (hash && hash.includes('access_token')) {
-        const params = new URLSearchParams(hash.substring(1))
-        const accessToken = params.get('access_token')
-        const refreshToken = params.get('refresh_token')
-        
-        if (accessToken && refreshToken) {
-          const { error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-          })
+      if (user) {
+        setIsValidSession(true)
+      } else {
+        // Проверяем hash параметры (если Supabase перенаправил сюда)
+        const hash = window.location.hash
+        if (hash && hash.includes('access_token')) {
+          const params = new URLSearchParams(hash.substring(1))
+          const accessToken = params.get('access_token')
+          const refreshToken = params.get('refresh_token')
           
-          if (!sessionError) {
-            setProcessing(false)
-            return
-          } else {
-            console.error('Ошибка установки сессии из hash:', sessionError)
+          if (accessToken && refreshToken) {
+            const { error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            })
+            
+            if (!error) {
+              setIsValidSession(true)
+              return
+            }
           }
         }
+        
+        // Если нет сессии, перенаправляем
+        setTimeout(() => router.push('/sign-in'), 3000)
+        setError('Ссылка для восстановления недействительна или истекла. Перенаправление...')
       }
-      
-      // 3. Проверяем существующую сессию
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          setProcessing(false)
-          return
-        }
-      } catch (err) {
-        console.error('Ошибка проверки пользователя:', err)
-      }
-      
-      // 4. Если ничего не подошло
-      setError('Недействительная или просроченная ссылка для восстановления доступа.')
-      timeoutRef.current = setTimeout(() => {
-        router.push('/sign-in')
-      }, 3000)
     }
     
-    handleRecovery()
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [router, searchParams])
+    checkSession()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -109,11 +74,10 @@ function UpdatePasswordForm() {
 
       if (updateError) throw updateError
 
-      await supabase.auth.signOut()
-      
       setSuccess(true)
       
-      timeoutRef.current = setTimeout(() => {
+      // Не выходим из системы сразу, даем пользователю понять что все ок
+      setTimeout(() => {
         router.push('/sign-in')
       }, 3000)
     } catch (err) {
@@ -122,12 +86,12 @@ function UpdatePasswordForm() {
     }
   }
 
-  if (processing) {
+  if (!isValidSession && !error) {
     return (
       <div className="auth-page">
         <div className="auth-card">
           <h1 className="auth-card__title">Проверка</h1>
-          <div className="auth-card__loading">Пожалуйста, подождите...</div>
+          <div className="auth-card__loading">Проверка ссылки восстановления...</div>
         </div>
       </div>
     )
@@ -138,11 +102,11 @@ function UpdatePasswordForm() {
       <div className="auth-card">
         <h1 className="auth-card__title">Новый пароль</h1>
         
-        {error && <div className="auth-card__error" role="alert">❌ {error}</div>}
+        {error && <div className="auth-card__error">❌ {error}</div>}
         
         {success ? (
-          <div className="auth-card__success" role="alert">
-            ✅ Пароль успешно обновлён! Войдите в аккаунт с новым паролем.
+          <div className="auth-card__success">
+            ✅ Пароль успешно изменён! Перенаправление на страницу входа...
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="auth-form">
@@ -156,6 +120,7 @@ function UpdatePasswordForm() {
                   className="auth-field__input"
                   required
                   placeholder="••••••••"
+                  minLength={6}
                 />
               </div>
               
@@ -168,12 +133,17 @@ function UpdatePasswordForm() {
                   className="auth-field__input"
                   required
                   placeholder="••••••••"
+                  minLength={6}
                 />
               </div>
             </div>
             
             <div className="auth-card__footer">
-              <button type="submit" disabled={loading} className="auth-card__btn">
+              <button 
+                type="submit" 
+                disabled={loading} 
+                className="auth-card__btn"
+              >
                 {loading ? 'Сохранение...' : 'Сохранить пароль'}
               </button>
             </div>
@@ -188,10 +158,7 @@ export default function UpdatePasswordPage() {
   return (
     <Suspense fallback={
       <div className="auth-page">
-        <div className="auth-card">
-          <h1 className="auth-card__title">Загрузка</h1>
-          <div className="auth-card__loading">Загрузка формы...</div>
-        </div>
+        <div className="auth-card">Загрузка...</div>
       </div>
     }>
       <UpdatePasswordForm />

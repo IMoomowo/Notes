@@ -1,7 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next()}
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -34,7 +36,6 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith('/sign-in') || 
                      request.nextUrl.pathname.startsWith('/sign-up')
   
-  // Разрешаем доступ к страницам восстановления пароля без авторизации
   const isPublicPage = request.nextUrl.pathname === '/update-password' ||
                        request.nextUrl.pathname === '/auth/callback'
 
