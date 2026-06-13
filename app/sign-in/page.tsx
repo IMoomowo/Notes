@@ -49,23 +49,26 @@ async function handleMagicLinkReset(e: React.FormEvent) {
   setResetMessage(null)
 
   try {
-    // Явно указываем полный URL с /update-password
-    const redirectUrl = 'https://notes-lovat-eta-35.vercel.app/update-password'
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: redirectUrl,
+    const response = await fetch('http://localhost:5000/api/password/reset-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: resetEmail })
     })
 
-    if (error) throw error
+    const data = await response.json()
 
-    setResetMessage('✨ Ссылка для восстановления пароля отправлена! Проверьте почту.')
+    if (!response.ok) {
+      throw new Error(data.error || 'Ошибка отправки')
+    }
+
+    setResetMessage('✅ Письмо для сброса пароля отправлено! Проверьте почту.')
     setTimeout(() => {
       setResetMode(false)
       setResetEmail('')
       setResetMessage(null)
     }, 4000)
   } catch (err) {
-    setResetMessage(err instanceof Error ? err.message : 'Ошибка отправки ссылки')
+    setResetMessage(err instanceof Error ? err.message : 'Ошибка отправки')
   } finally {
     setResetLoading(false)
   }
