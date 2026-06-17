@@ -20,7 +20,6 @@ export default function MediaUploader({ noteId, onMediaUploaded }: MediaUploader
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Не авторизован')
 
-      // Сохраняем оригинальное имя файла
       const originalName = file.name
       const fileExt = originalName.split('.').pop()
       const fileName = `${user.id}/${noteId}/${Date.now()}.${fileExt}`
