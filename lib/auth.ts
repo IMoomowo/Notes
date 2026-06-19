@@ -25,7 +25,7 @@ export async function deleteAccount() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Пользователь не авторизован')
 
-  // 1. Удаляем все файлы пользователя из Storage
+  // Удаляем все файлы пользователя из Storage
   const { data: files } = await supabase.storage
     .from('notes-media')
     .list(`${user.id}/`)
@@ -35,7 +35,7 @@ export async function deleteAccount() {
     await supabase.storage.from('notes-media').remove(filePaths)
   }
 
-  // 2. Удаляем заметки (теги удалятся автоматически через CASCADE)
+  //  Удаляем заметки 
   const { error: notesError } = await supabase
     .from('notes')
     .delete()
@@ -43,7 +43,7 @@ export async function deleteAccount() {
   
   if (notesError) throw notesError
 
-  // 3. Удаляем теги (если остались сироты)
+  // Удаляем теги (если остались сироты)
   const { error: tagsError } = await supabase
     .from('tags')
     .delete()
@@ -51,7 +51,7 @@ export async function deleteAccount() {
   
   if (tagsError) throw tagsError
 
-  // 4. Удаляем самого пользователя (через admin API)
+  // Удаляем самого пользователя (через admin API)
   const response = await fetch('/api/delete-user', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },

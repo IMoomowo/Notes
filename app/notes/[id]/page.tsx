@@ -62,7 +62,7 @@ const [historyIndex, setHistoryIndex] = useState(-1)
   })
 }, [historyIndex])
 
-  // Отмена последнего действия (Ctrl+Z / кнопка "Назад")
+  // Отмена последнего действия 
   const undo = useCallback(() => {
   if (historyIndex > 0) {
     const prevState = history[historyIndex - 1]
@@ -173,7 +173,6 @@ const updateAudio = (newAudio: string | null) => {
   const deleteFromStorage = async (url: string) => {
     try {
       // Извлекаем путь файла из URL
-      // URL вида: https://.../storage/v1/object/public/notes-media/folder/file.jpg
       const urlObj = new URL(url)
       const pathParts = urlObj.pathname.split('/')
       const bucketIndex = pathParts.indexOf('notes-media')
@@ -259,13 +258,9 @@ const updateAudio = (newAudio: string | null) => {
   function addExistingTag(tagId: string) {
   const tagToAdd = allTags.find(t => t.id === tagId)
   if (tagToAdd && !selectedTags.some(t => t.id === tagId)) {
-    addTag(tagToAdd)  // ← используем обёртку
+    addTag(tagToAdd) 
     setShowTagDropdown(false)
   }
-}
-
-  function removeTag(tagId: string) {
-  removeTagById(tagId)  // ← используем обёртку
 }
 
   async function handleCreateTag() {
@@ -309,11 +304,11 @@ const updateAudio = (newAudio: string | null) => {
     if (!confirmed) return
 
     try {
-      // Удаляем все изображения из Storage
+      
       for (const imageUrl of images) {
         await deleteFromStorage(imageUrl)
       }
-      // Удаляем аудио из Storage
+      
       if (audio) {
         await deleteFromStorage(audio)
       }
@@ -340,7 +335,7 @@ useEffect(() => {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [history, historyIndex])
+  }, [undo])
 
 
   if (loading) {
@@ -391,7 +386,7 @@ useEffect(() => {
               {selectedTags.map((tag) => (
                 <span key={tag.id} className="note-detail-tag">
                   {tag.name}
-                  <button onClick={() => removeTag(tag.id)} className="note-detail-tag-remove">✕</button>
+                  <button onClick={() => removeTagById(tag.id)} className="note-detail-tag-remove">✕</button>
                 </span>
               ))}
               
@@ -491,7 +486,8 @@ useEffect(() => {
                 
                 return (
                   <div key={index} className="note-detail-image-wrapper">
-                    <img src={url} alt={`Изображение ${index + 1}`} className="note-detail-image" />
+                    <img src={url} alt="Изображение"
+                    className="note-detail-image" />
                     <div className="note-detail-image-actions">
                       <button onClick={handleDownload} className="note-detail-image-download" title="Скачать">
                         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">

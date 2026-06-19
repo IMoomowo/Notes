@@ -10,7 +10,7 @@ interface NoteCardProps {
   tags: Tag[]
   createdAt: string | null
   onDelete: () => void
-  hasMedia?: boolean  // добавляем пропс
+  hasMedia?: boolean 
 }
 
 export default function NoteCard({ id, title, content, tags, onDelete, hasMedia }: NoteCardProps) {
@@ -45,6 +45,8 @@ export default function NoteCard({ id, title, content, tags, onDelete, hasMedia 
           )}
         </div>
         <div className="note-card__right">
+
+
           {hasMedia && (
             <span className="note-card__media-icon" title="Есть медиафайлы">
               <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -52,6 +54,8 @@ export default function NoteCard({ id, title, content, tags, onDelete, hasMedia 
 </svg>
             </span>
           )}
+
+          
           <button onClick={onDelete} className="note-card__delete-btn" title="Удалить">
             <svg width="21" height="28" viewBox="0 0 21 28" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M14.4439 2.78906V0H6.5561V2.78906H0V5.57812H21V2.78906M1.33171 8.42188V28H19.6683V8.42188H1.33171ZM6.5561 25.2109H3.9439V11.2109H6.5561V25.2109ZM11.8317 25.2109H9.16829V11.2109H11.8317V25.2109ZM17.0561 25.2109H14.4439V11.2109H17.0561V25.2109Z" fill="#852221"/>

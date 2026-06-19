@@ -79,7 +79,7 @@ export default function Sidebar({ onOpenCreateModal }: SidebarProps) {
         </button>
       </aside>
 
-      {/* Затемнение для мобильного меню */}
+      {/* Затемнение для мобильного меню  */}
       {mobileMenuOpen && (
         <div className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} />
       )}

@@ -1,125 +1,103 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
-function UpdatePasswordForm() {
+export default function UpdatePasswordPage() {
   const router = useRouter()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
   const [isValidSession, setIsValidSession] = useState<boolean | null>(null)
+  const [status, setStatus] = useState({
+    loading: false,
+    error: null as string | null,
+    success: false
+  })
 
+  // Проверка сессии
   useEffect(() => {
     const handleRecoverySession = async () => {
-      console.log('🔍 Проверка сессии восстановления...')
-      
-      // Получаем hash из URL (то, что после #)
       const hash = window.location.hash
-      console.log('📍 Hash из URL:', hash)
       
-      // Если есть hash с access_token, обрабатываем его
-      if (hash && hash.includes('access_token')) {
-        console.log('🔄 Найден access_token в hash, устанавливаем сессию...')
-        
-        const params = new URLSearchParams(hash.substring(1))
+      // Если есть токен в hash - устанавливаем сессию
+      if (hash.includes('access_token')) {
+        const params = new URLSearchParams(hash.replace('#', ''))
         const accessToken = params.get('access_token')
         const refreshToken = params.get('refresh_token')
         
         if (accessToken && refreshToken) {
-          // Устанавливаем сессию из hash параметров
-          const { data, error: sessionError } = await supabase.auth.setSession({
+          const { error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken
           })
           
-          if (sessionError) {
-            console.error('❌ Ошибка установки сессии:', sessionError)
-            setError('Ссылка для восстановления недействительна или истекла.')
-            setTimeout(() => router.push('/sign-in'), 3000)
-            setIsValidSession(false)
+          if (!error) {
+            setIsValidSession(true)
             return
           }
           
-          console.log('✅ Сессия установлена, пользователь:', data.user?.email)
-          setIsValidSession(true)
+          console.error('Ошибка установки сессии:', error)
+          setIsValidSession(false)
+          setTimeout(() => router.push('/sign-in'), 3000)
           return
         }
       }
       
-      // Если нет hash, проверяем существующую сессию
-      console.log('🔍 Проверяем существующую сессию...')
-      const { data: { session }, error: sessionCheckError } = await supabase.auth.getSession()
-      
-      if (sessionCheckError) {
-        console.error('❌ Ошибка проверки сессии:', sessionCheckError)
-      }
+      // Проверяем существующую сессию
+      const { data: { session } } = await supabase.auth.getSession()
       
       if (session) {
-        console.log('✅ Найдена активная сессия, пользователь:', session.user.email)
         setIsValidSession(true)
         return
       }
       
-      // Если ничего не подошло
-      console.log('❌ Нет действительной сессии')
-      setError('Ссылка для восстановления недействительна или истекла. Запросите сброс пароля заново.')
-      setTimeout(() => router.push('/sign-in'), 4000)
       setIsValidSession(false)
+      setTimeout(() => router.push('/sign-in'), 4000)
     }
     
     handleRecoverySession()
   }, [router])
 
+  // Обновление пароля
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают')
+      setStatus(prev => ({ ...prev, error: 'Пароли не совпадают' }))
       return
     }
     
     if (password.length < 6) {
-      setError('Пароль должен быть не менее 6 символов')
+      setStatus(prev => ({ ...prev, error: 'Пароль должен быть не менее 6 символов' }))
       return
     }
 
-    setLoading(true)
-    setError(null)
+    setStatus({ loading: true, error: null, success: false })
 
     try {
-      console.log('🔄 Обновление пароля...')
+      const { error } = await supabase.auth.updateUser({ password })
       
-      // Обновляем пароль
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password
-      })
-
-      if (updateError) {
-        console.error('❌ Ошибка обновления:', updateError)
-        throw updateError
-      }
-
-      console.log('✅ Пароль успешно обновлен!')
-      setSuccess(true)
+      if (error) throw error
       
-      // Выходим из системы через 2 секунды
+      setStatus({ loading: false, error: null, success: true })
+      
       setTimeout(async () => {
         await supabase.auth.signOut()
         router.push('/sign-in')
       }, 2000)
       
     } catch (err) {
-      console.error('❌ Ошибка:', err)
-      setError(err instanceof Error ? err.message : 'Ошибка обновления пароля')
-      setLoading(false)
+      console.error('Ошибка обновления:', err)
+      setStatus({
+        loading: false,
+        error: err instanceof Error ? err.message : 'Ошибка обновления пароля',
+        success: false
+      })
     }
   }
 
-  // Показываем загрузку, пока проверяем сессию
+  // Состояние загрузки
   if (isValidSession === null) {
     return (
       <div className="auth-page">
@@ -131,13 +109,15 @@ function UpdatePasswordForm() {
     )
   }
 
-  // Если сессия недействительна
+  // Невалидная сессия
   if (isValidSession === false) {
     return (
       <div className="auth-page">
         <div className="auth-card">
           <h1 className="auth-card__title">Ошибка</h1>
-          {error && <div className="auth-card__error">❌ {error}</div>}
+          <div className="auth-card__error">
+            Ссылка для восстановления недействительна или истекла.
+          </div>
           <button onClick={() => router.push('/sign-in')} className="auth-card__btn">
             Вернуться ко входу
           </button>
@@ -152,11 +132,11 @@ function UpdatePasswordForm() {
       <div className="auth-card">
         <h1 className="auth-card__title">Новый пароль</h1>
         
-        {error && <div className="auth-card__error">❌ {error}</div>}
+        {status.error && <div className="auth-card__error">❌ {status.error}</div>}
         
-        {success ? (
+        {status.success ? (
           <div className="auth-card__success">
-            ✅ Пароль успешно изменён! Перенаправление на страницу входа...
+            Пароль успешно изменён! Перенаправление на страницу входа...
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="auth-form">
@@ -170,7 +150,6 @@ function UpdatePasswordForm() {
                   className="auth-field__input"
                   required
                   placeholder="••••••••"
-                  minLength={6}
                   autoComplete="new-password"
                 />
               </div>
@@ -184,8 +163,6 @@ function UpdatePasswordForm() {
                   className="auth-field__input"
                   required
                   placeholder="••••••••"
-                  minLength={6}
-                  autoComplete="new-password"
                 />
               </div>
             </div>
@@ -193,27 +170,15 @@ function UpdatePasswordForm() {
             <div className="auth-card__footer">
               <button 
                 type="submit" 
-                disabled={loading} 
+                disabled={status.loading} 
                 className="auth-card__btn"
               >
-                {loading ? 'Сохранение...' : 'Сохранить пароль'}
+                {status.loading ? 'Сохранение...' : 'Сохранить пароль'}
               </button>
             </div>
           </form>
         )}
       </div>
     </div>
-  )
-}
-
-export default function UpdatePasswordPage() {
-  return (
-    <Suspense fallback={
-      <div className="auth-page">
-        <div className="auth-card">Загрузка...</div>
-      </div>
-    }>
-      <UpdatePasswordForm />
-    </Suspense>
   )
 }

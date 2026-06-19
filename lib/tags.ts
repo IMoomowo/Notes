@@ -18,7 +18,7 @@ export async function getAllTags(): Promise<Tag[]> {
   return data || []
 }
 
-// Получить теги для конкретной заметки (упрощённая версия без сложных типов)
+// Получить теги для конкретной заметки
 export async function getTagsForNote(noteId: string): Promise<Tag[]> {
   // Сначала получаем ID тегов, связанных с заметкой
   const { data: noteTags, error: noteTagsError } = await supabase

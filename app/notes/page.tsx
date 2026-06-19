@@ -159,7 +159,7 @@ function NotesContent() {
   if (!confirmed) return
 
   try {
-    // 1. Получаем заметку, чтобы знать какие файлы удалять
+    // Получаем заметку, чтобы знать какие файлы удалять
     const { data: note, error: fetchError } = await supabase
       .from('notes')
       .select('images, audio')
@@ -168,19 +168,19 @@ function NotesContent() {
 
     if (fetchError) throw fetchError
 
-    // 2. Удаляем изображения из Storage
+    // Удаляем изображения из Storage
     if (note.images && note.images.length > 0) {
       for (const imageUrl of note.images) {
         await deleteFromStorage(imageUrl)
       }
     }
 
-    // 3. Удаляем аудио из Storage
+    //  Удаляем аудио из Storage
     if (note.audio) {
       await deleteFromStorage(note.audio)
     }
 
-    // 4. Удаляем заметку из БД
+    // Удаляем заметку из БД
     const { error } = await supabase
       .from('notes')
       .delete()
@@ -244,7 +244,7 @@ function NotesContent() {
   )
 }
 
-// ГЛАВНЫЙ ЭКСПОРТ — обёрнутый в SidebarLayout
+
 export default function NotesPage() {
   return (
     <SidebarLayout>

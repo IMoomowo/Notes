@@ -19,7 +19,7 @@ export default function SignIn() {
   const router = useRouter()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Очищаем таймер при размонтировании во избежание утечек памяти
+  
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {

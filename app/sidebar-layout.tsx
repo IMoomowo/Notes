@@ -36,7 +36,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
     loadAllTags()
   }, [])
 
-  // Слушаем глобальное событие для открытия модалки
+  // глобальное событие для открытия модалки
   useEffect(() => {
     const handleOpenModal = () => {
       setNewNoteTitle('')

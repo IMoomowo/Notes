@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import {useDebouncedCallback} from 'use-debounce'
 
 interface SearchBarProps {
   onSearch: (query: string) => void
@@ -14,12 +15,18 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     onSearch(query)
   }
 
+const debouncedSearch = useDebouncedCallback(
+  (value:string)=>onSearch(value),
+  300
+)
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     // Очищаем от спецсимволов, оставляем буквы, цифры, пробелы
     const cleaned = value.replace(/[^\w\sа-яА-ЯёЁ]/g, '')
     setQuery(cleaned)
     onSearch(cleaned)
+    debouncedSearch(cleaned)
   }
 
   return (

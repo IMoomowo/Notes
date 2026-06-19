@@ -15,7 +15,7 @@ export default function SignUp() {
   const router = useRouter()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Очищаем таймер при размонтировании компонента
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -39,7 +39,7 @@ export default function SignUp() {
 
       setSuccess(true)
       
-      // Плавно и красиво перенаправляем на страницу входа через 3 секунды
+
       timeoutRef.current = setTimeout(() => {
         router.push('/sign-in')
       }, 3000)
@@ -63,7 +63,7 @@ export default function SignUp() {
 
         {success ? (
           <div className="auth-card__success" role="alert">
-            ✅ Регистрация успешна! Сейчас вы будете перенаправлены на страницу входа...
+            Регистрация успешна! Сейчас вы будете перенаправлены на страницу входа...
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="auth-form">
