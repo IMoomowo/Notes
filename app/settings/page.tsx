@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { resetPassword, deleteAccount } from '@/lib/auth'
 import SidebarLayout from '../sidebar-layout'
 
 function SettingsContent() {
@@ -13,6 +12,7 @@ function SettingsContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
 
+  // Сброс пароля через API
   const handleResetPassword = async () => {
     if (!resetEmail) {
       setMessage({ type: 'error', text: 'Введите email' })
@@ -23,26 +23,61 @@ function SettingsContent() {
     setMessage(null)
 
     try {
-      await resetPassword(resetEmail)
-      setMessage({ type: 'success', text: 'Письмо для сброса пароля отправлено на почту' })
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail })
+      })
+
+      const data = await response.json()
+
+      // API всегда возвращает успешный ответ (даже если email не найден)
+      // Это защита от перебора email-адресов
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка сброса пароля')
+      }
+
+      setMessage({ 
+        type: 'success', 
+        text: data.message || 'Письмо для сброса пароля отправлено на почту' 
+      })
       setShowResetConfirm(false)
       setResetEmail('')
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Ошибка сброса пароля' })
+      setMessage({ 
+        type: 'error', 
+        text: err instanceof Error ? err.message : 'Ошибка сброса пароля' 
+      })
     } finally {
       setLoading(false)
     }
   }
 
+  // Удаление аккаунта
   const handleDeleteAccount = async () => {
     setLoading(true)
     setMessage(null)
 
     try {
-      await deleteAccount()
+      const response = await fetch('/api/delete-user', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка удаления аккаунта')
+      }
+
+      // Перенаправляем на страницу входа после успешного удаления
       router.push('/sign-in')
+      router.refresh() // Обновляем кэш
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Ошибка удаления аккаунта' })
+      setMessage({ 
+        type: 'error', 
+        text: err instanceof Error ? err.message : 'Ошибка удаления аккаунта' 
+      })
       setShowDeleteConfirm(false)
     } finally {
       setLoading(false)
@@ -77,18 +112,31 @@ function SettingsContent() {
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   className="settings-input"
+                  autoFocus
                 />
                 <div className="settings-card__actions">
-                  <button onClick={() => setShowResetConfirm(false)} className="btn-secondary">
+                  <button 
+                    onClick={() => setShowResetConfirm(false)} 
+                    className="btn-secondary"
+                    disabled={loading}
+                  >
                     Отмена
                   </button>
-                  <button onClick={handleResetPassword} disabled={loading} className="btn-primary">
-                    Отправить
+                  <button 
+                    onClick={handleResetPassword} 
+                    disabled={loading || !resetEmail} 
+                    className="btn-primary"
+                  >
+                    {loading ? 'Отправка...' : 'Отправить'}
                   </button>
                 </div>
               </div>
             ) : (
-              <button onClick={() => setShowResetConfirm(true)} className="btn-outline">
+              <button 
+                onClick={() => setShowResetConfirm(true)} 
+                className="btn-outline"
+                disabled={loading}
+              >
                 Сбросить пароль
               </button>
             )}
@@ -103,16 +151,28 @@ function SettingsContent() {
               <div className="settings-card__form">
                 <p className="warning-text">Вы уверены? Это действие необратимо.</p>
                 <div className="settings-card__actions">
-                  <button onClick={() => setShowDeleteConfirm(false)} className="btn-secondary">
+                  <button 
+                    onClick={() => setShowDeleteConfirm(false)} 
+                    className="btn-secondary"
+                    disabled={loading}
+                  >
                     Отмена
                   </button>
-                  <button onClick={handleDeleteAccount} disabled={loading} className="btn-danger">
+                  <button 
+                    onClick={handleDeleteAccount} 
+                    disabled={loading} 
+                    className="btn-danger"
+                  >
                     {loading ? 'Удаление...' : 'Да, удалить аккаунт'}
                   </button>
                 </div>
               </div>
             ) : (
-              <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger-outline">
+              <button 
+                onClick={() => setShowDeleteConfirm(true)} 
+                className="btn-danger-outline"
+                disabled={loading}
+              >
                 Удалить аккаунт
               </button>
             )}
