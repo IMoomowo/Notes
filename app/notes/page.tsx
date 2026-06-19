@@ -99,7 +99,13 @@ function NotesContent() {
           filtered = filtered.filter(note => note.title.toLowerCase().includes(query))
           break
         case 'tags':
-          filtered = filtered.filter(note => note.tags?.some(tag => tag.name.toLowerCase().includes(query)))
+          const tagQueries = query.split(/[,，\s]+/).filter(Boolean)
+
+          filtered = filtered.filter(note => {
+            const noteTagNames = note.tags?.map(t => t.name.toLowerCase()) || []
+            return tagQueries.every(q => 
+      noteTagNames.some(tagName => tagName.includes(q)))
+          })
           break
         default:
           filtered = filtered.filter(note => {

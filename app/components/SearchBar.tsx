@@ -23,7 +23,7 @@ const debouncedSearch = useDebouncedCallback(
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     // Очищаем от спецсимволов, оставляем буквы, цифры, пробелы
-    const cleaned = value.replace(/[^\w\sа-яА-ЯёЁ]/g, '')
+    const cleaned = value.replace(/,[^\w\sа-яА-ЯёЁ]/g, '')
     setQuery(cleaned)
     onSearch(cleaned)
     debouncedSearch(cleaned)
