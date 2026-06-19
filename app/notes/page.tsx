@@ -9,12 +9,14 @@ import SearchBar from '../components/SearchBar'
 import SortButton from '../components/SortButton'
 import SidebarLayout from '../sidebar-layout'
 import { deleteFromStorage } from '@/lib/storage'
+import ActivityWelcome from '../components/Activity'
 
 interface Note {
   id: string
   title: string
   content: string | null
   created_at: string | null
+  updated_at: string | null
   tags?: Tag[]
   images?: string[]
   audio?: string | null
@@ -223,6 +225,9 @@ function NotesContent() {
         </div>
       </div>
       
+    <ActivityWelcome notes={notes}/>
+
+
       <div className="notes-list">
         <div className="notes-header">
           <h2>Список заметок ({filteredNotes.length})</h2>
