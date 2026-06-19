@@ -1,4 +1,3 @@
-// app/update-password/page.tsx
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'

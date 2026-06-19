@@ -29,7 +29,6 @@ export default function AuthCallback() {
             })
             
             if (!sessionError && data.session) {
-              // Успешная авторизация → отправляем на страницу обновления пароля
               router.push('/update-password')
               return
             }
@@ -39,7 +38,7 @@ export default function AuthCallback() {
         }
       }
       
-      // Запасной вариант: если токенов в hash нет, проверяем текущую сессию пользователя
+      //токенов в hash нет, проверяем текущую сессию пользователя
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
@@ -50,7 +49,6 @@ export default function AuthCallback() {
         console.error('Ошибка проверки пользователя:', err)
       }
       
-      // Если войти так и не удалось — показываем ошибку и возвращаем на страницу входа
       setError('Не удалось войти. Пожалуйста, запросите ссылку восстановления пароля ещё раз.')
       
       timeoutId = setTimeout(() => {

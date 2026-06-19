@@ -6,7 +6,7 @@ export async function DELETE() {
   try {
     const cookieStore = await cookies()
 
-    // 1. Создаем клиент с обычными анонимными правами для проверки сессии текущего пользователя
+    // клиент с обычными анонимными правами для проверки сессии текущего пользователя
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,14 +21,13 @@ export async function DELETE() {
                 cookieStore.set(name, value, options)
               )
             } catch {
-              // Ignore
             }
           },
         },
       }
     )
 
-    // Используем getUser() вместо getSession() для максимальной безопасности на бэкенде
+    // Используем getUser() - валидация токена на сервере супабейз
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
@@ -38,10 +37,10 @@ export async function DELETE() {
       )
     }
 
-    // Идентификатор пользователя берется ИСКЛЮЧИТЕЛЬНО из проверенной сессии сервера
+    // Идентификатор пользователя берется из проверенной сессии от супабейз
     const verifiedUserId = user.id
 
-    // 2. Создаем админ-клиент с сервисным ключом (Service Role Key)
+    // Создаем админ-клиент с сервисным ключом для удаления
     const supabaseAdmin = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -55,17 +54,17 @@ export async function DELETE() {
       }
     )
 
-    // 3. Безопасно удаляем только того пользователя, который сделал этот запрос
+    // Безопасно удаляем только того пользователя, который сделал этот запрос
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(verifiedUserId)
     
     if (deleteError) throw deleteError
 
-    // 4. Очищаем текущую сессию в куках, чтобы разлогинить удаленного пользователя
+    // Очищаем куки сессии, чтобы разлогинить удаленного пользователя
     await supabase.auth.signOut()
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Ошибка при безопасном удалении пользователя:', error)
+    console.error('Ошибка при удалении пользователя:', error)
     return NextResponse.json(
       { error: 'Не удалось удалить пользователя' },
       { status: 500 }
